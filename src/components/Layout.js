@@ -1,21 +1,13 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Container } from 'reactstrap';
-import NavMenu from './NavMenu';
-import Particle from './Particles';
-import './Layout.css'
+import './Layout.css';
 
-export class Layout extends Component {
-  static displayName = Layout.name;
+const Layout = ({ children }) => {
+  return (
+    <div>
+      <Container style={{ marginTop: '100px' }}>{children}</Container>
+  </div>
+  );
+};
 
-  render() {
-    return (
-      <div>
-        <NavMenu />
-        <Particle className="particles"/>
-        <Container style={{ marginTop: '100px' }}>
-          {this.props.children}
-        </Container>
-      </div>
-    );
-  }
-}
+export default Layout;
