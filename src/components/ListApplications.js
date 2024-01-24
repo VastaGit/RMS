@@ -2,12 +2,12 @@ import React, { useState } from 'react'
 import Scopus from './Scopus'
 import WebOfScience from './WebOfScience'
 
-const ListApplications = () => {
+
+const ListApplications = ({ user }) => {
   const [selectedOption, setSelectedOption] = useState(null)
 
   const handleChange = e => {
     setSelectedOption(e.target.value)
-    
   }
 
   return (
@@ -27,7 +27,7 @@ const ListApplications = () => {
             Academic Term
           </label>
           <input
-            className='shadow appearance-none border rounded w-full py-2 px-3 text-[#edf6f9] leading-tight focus:outline-none focus:shadow-outline'
+            className='shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
             id='academicTerm'
             type='text'
             placeholder='2023-24'
@@ -41,7 +41,7 @@ const ListApplications = () => {
             Semester
           </label>
           <input
-            className='shadow appearance-none border rounded w-full py-2 px-3 text-[#edf6f9] leading-tight focus:outline-none focus:shadow-outline'
+            className='shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
             id='semester'
             type='text'
             placeholder='1'
@@ -59,7 +59,7 @@ const ListApplications = () => {
             onChange={handleChange}
             value={selectedOption}
             defaultValue={'Web of Science'}
-            className='block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline'
+            className='block w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline'
             id='awards'
           >
             <option value='WebOfScience'>Web of Science</option>
@@ -69,7 +69,8 @@ const ListApplications = () => {
             <i className='fas fa-chevron-down'></i>
           </div>
         </div>
-        {selectedOption === 'Scopus' ? <Scopus /> : <WebOfScience />}
+        {selectedOption === 'Scopus' ? <Scopus user_info={user}/> : <WebOfScience user_info={user}/>}
+        
       </div>
     </div>
   )

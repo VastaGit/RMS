@@ -1,152 +1,111 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
+import { ToastContainer, toast, Bounce } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
-const Register = () => {
-  const [DOI, setDOI] = useState('');
-  const [title, setTitle] = useState('');
-  const [authors, setAuthors] = useState('');
-  const [journal, setJournal] = useState('');
-  const [number_of_authors, setNumberOfAuthors] = useState('');
-  const [publication_date, setPublicationDate] = useState('');
-  const [volume, setVolume] = useState('');
-  const [issue, setIssue] = useState('');
-  const [page, setPage] = useState('');
+const Home = ({ user }) => {
+  const [articles, setArticles] = useState([])
 
-  const handleRegister = () => {
-    // Add your authentication logic here
-    console.log(`Logging in with ${DOI} and ${title}`);
-  };
-  // green 81b29a
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/articles')
+        setArticles([...articles, ...response.data])
+      } catch (error) {
+        console.error('Error fetching articles:', error)
+      }
+    }
+    fetchArticles()
+  }, [])
+
+  const handleDeleteArticle = async index => {
+    console.log(articles[index], index)
+    try {
+      await axios
+        .post(`http://localhost:3000/delete/`, { doi: articles[index].DOI })
+        .then(response => {
+          toast.success('Publication succesfully deleted!', {
+            position: 'top-right',
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'light',
+            transition: Bounce
+          })
+          console.log('User deleted successfully:', response.data)
+        })
+    } catch (error) {
+      // Handle error
+      console.error('Error deleting user:', error)
+    }
+    const updatedArticles = [...articles]
+    updatedArticles.splice(index, 1)
+    setArticles(updatedArticles)
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="bg-[#004e98] p-8 rounded-lg border-4 border-black w-6/12"
-        style={{ boxShadow: '6px 6px 0px 0px rgba(0, 0, 0, 1)', }}>
-        <div className="mb-4">
-          <label className="block text-[#edf6f9] text-sm font-bold mb-2" htmlFor="DOI">
-            DOI
-          </label>
-          <input
-            className="w-full border-2 border-black rounded-lg py-2 px-3 focus:outline-none focus:border-blue-500"
-            type="text"
-            id="DOI"
-            value={DOI}
-            onChange={(e) => setDOI(e.target.value)}
-          />
+    <div className='container mx-auto p-8'>
+      <ToastContainer />
+      <div
+        className='max-w-full mx-auto bg-[#004e98] p-8 rounded-lg border-4 border-black'
+        style={{ boxShadow: '6px 6px 0px 0px rgba(0, 0, 0, 1)' }}
+      >
+        <div className='text-lg text-[#edf6f9]'>
+          <table className='w-full border-collapse border rounded border-black max-w-full'>
+            <thead>
+              <tr className='bg-black'>
+                <th className='p-2 text-center'>DOI</th>
+                <th className='p-2 text-center'>Title</th>
+                <th className='p-2 text-center'>Authors</th>
+                <th className='p-2 text-center'>Journal</th>
+                <th className='p-2 text-center'>Publication Date</th>
+                <th className='p-2 text-center'>Status</th>
+                <th className='p-2 text-center'>Actions</th>
+              </tr>
+            </thead>
+            <tbody className='border-black'>
+              {articles.map((article, index) =>
+                article.UserPersonnelNumber === user.PersonnelNumber ? (
+                  <tr
+                    key={index}
+                    className='border-b border-r bg-white text-black'
+                  >
+                    <td className='p-2 text-center  border-r'>{article.DOI}</td>
+                    <td className='p-2 text-center  border-r'>
+                      {article.Title}
+                    </td>
+                    <td className='p-2 text-center  border-r'>
+                      {article.Authors.join(', ')}
+                    </td>
+                    <td className='p-2 text-center  border-r'>
+                      {article.JournalTitle}
+                    </td>
+                    <td className='p-2 text-center  border-r'>
+                      {article.PublicationDate}
+                    </td>
+                    <td className='p-2 text-center  border-r'>
+                      {article.Status}
+                    </td>
+                    <td className='p-2 text-center  border-r'>
+                      <button
+                        onClick={() => handleDeleteArticle(index)}
+                        className='text-red-500 hover:text-red-700'
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ) : null
+              )}
+            </tbody>
+          </table>
         </div>
-        <div className="mb-4">
-          <label className="block text-[#edf6f9] text-sm font-bold mb-2" htmlFor="title">
-            Title
-          </label>
-          <input
-            disabled="true"
-            className="w-full border-2 border-black rounded-lg py-2 px-3 focus:outline-none focus:border-blue-500"
-            type="text"
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-[#edf6f9] text-sm font-bold mb-2" htmlFor="authors">
-            Authors
-          </label>
-          <input
-            disabled="true"
-            className="w-full border-2 border-black rounded-lg py-2 px-3 focus:outline-none focus:border-blue-500"
-            type="text"
-            id="authors"
-            value={authors}
-            onChange={(e) => setAuthors(e.target.value)}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-[#edf6f9] text-sm font-bold mb-2" htmlFor="journal">
-            Journal
-          </label>
-          <input
-            disabled="true"
-            className="w-full border-2 border-black rounded-lg py-2 px-3 focus:outline-none focus:border-blue-500"
-            type="text"
-            id="journal"
-            value={journal}
-            onChange={(e) => setJournal(e.target.value)}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-[#edf6f9] text-sm font-bold mb-2" htmlFor="publication_date">
-            Publication date
-          </label>
-          <input
-            disabled="true"
-            className="w-full border-2 border-black rounded-lg py-2 px-3 focus:outline-none focus:border-blue-500"
-            type="text"
-            id="publication_date"
-            value={publication_date}
-            onChange={(e) => setPublicationDate(e.target.value)}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-[#edf6f9] text-sm font-bold mb-2" htmlFor="number_of_authors">
-            Number of authors
-          </label>
-          <input
-            disabled="true"
-            className="w-full border-2 border-black rounded-lg py-2 px-3 focus:outline-none focus:border-blue-500"
-            type="text"
-            id="number_of_authors"
-            value={number_of_authors}
-            onChange={(e) => setNumberOfAuthors(e.target.value)}
-            />
-        </div>
-        <div className="mb-4">
-          <label className="block text-[#edf6f9] text-sm font-bold mb-2" htmlFor="volume">
-            Volume
-          </label>
-          <input
-            disabled="true"
-            className="w-full border-2 border-black rounded-lg py-2 px-3 focus:outline-none focus:border-blue-500"
-            type="text"
-            id="volume"
-            value={volume}
-            onChange={(e) => setVolume(e.target.value)}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-[#edf6f9] text-sm font-bold mb-2" htmlFor="issue">
-            Issue
-          </label>
-          <input
-            disabled="true"
-            className="w-full border-2 border-black rounded-lg py-2 px-3 focus:outline-none focus:border-blue-500"
-            type="text"
-            id="issue"
-            value={issue}
-            onChange={(e) => setIssue(e.target.value)}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-[#edf6f9] text-sm font-bold mb-2" htmlFor="page">
-            Page
-          </label>
-          <input
-            disabled="true"
-            className="w-full border-2 border-black rounded-lg py-2 px-3 focus:outline-none focus:border-blue-500"
-            type="text"
-            id="page"
-            value={page}
-            onChange={(e) =>  setPage(e.target.value)}
-          />
-        </div>
-        <button
-          className=" bg-[#edf6f9] text-lg font-bold text-black py-2 px-4 rounded-lg border-4 border-black  transition duration-300 hover:scale-105 "
-          onClick={handleRegister}
-          onMouseEnter={(e) => (e.target.style.boxShadow = '6px 6px 0px 0px rgba(0, 0, 0, 1)')}
-          onMouseLeave={(e) => (e.target.style.boxShadow = 'none')}
-        >
-          Register
-        </button>
       </div>
-    </div >
-  );
+    </div>
+  )
 }
 
-export default Register;
+export default Home
